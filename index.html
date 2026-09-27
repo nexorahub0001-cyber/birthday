@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A Little Journey of Us</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,500&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+  /* ============ TOKENS ============ */
+  :root{
+    --plum:        #2b0f1a;
+    --wine:        #4a1526;
+    --rose:        #c9506a;
+    --rose-soft:   #e7899d;
+    --blush:       #f7e3e6;
+    --gold:        #d8a960;
+    --gold-soft:   #f1dcae;
+    --cream:       #fff8f2;
+    --ink:         #2b0f1a;
+    --shadow:      rgba(43, 15, 26, 0.35);
+
+    --font-display: "Cormorant Garamond", serif;
+    --font-body: "Quicksand", sans-serif;
+  }
+
+  *{ box-sizing: border-box; }
+  html{ scroll-behavior: smooth; }
+
+  body{
+    margin:0;
+    background: var(--plum);
+    color: var(--cream);
+    font-family: var(--font-body);
+    overflow-x: hidden;
+  }
+
+  h1,h2,h3{
+    font-family: var(--font-display);
+    font-weight: 600;
+    margin: 0;
+  }
+
+  .screen{
+    min-height: 100vh;
+    width: 100%;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 8vh 6vw;
+    position: relative;
+    text-align: center;
+  }
+  .screen.active{ display: flex; }
+
+  /* ============ AMBIENT BACKGROUND (floating hearts / petals) ============ */
+  #ambient{
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+  }
+  .drift{
+    position: absolute;
+    bottom: -40px;
+    font-size: 20px;
+    opacity: 0.55;
+    animation: floatUp linear infinite;
+    color: var(--rose-soft);
+    user-select: none;
+  }
+  @keyframes floatUp{
+    0%   { transform: translateY(0) translateX(0) rotate(0deg); opacity: 0; }
+    10%  { opacity: 0.6; }
+    90%  { opacity: 0.5; }
+    100% { transform: translateY(-115vh) translateX(var(--drift-x, 30px)) rotate(360deg); opacity: 0; }
+  }
+
+  .screen > *{ position: relative; z-index: 1; }
+
+  /* ============ BUTTONS ============ */
+  .btn{
+    font-family: var(--font-body);
+    font-weight: 600;
+    font-size: 1rem;
+    letter-spacing: 0.02em;
+    padding: 0.95em 2.2em;
+    border-radius: 999px;
+    border: 1px solid var(--gold);
+    background: transparent;
+    color: var(--gold-soft);
+    cursor: pointer;
+    transition: transform 0.25s ease, background 0.25s ease, color 0.25s ease, box-shadow 0.25s ease;
+  }
+  .btn:hover{
+    background: var(--gold);
+    color: var(--plum);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px var(--shadow);
+  }
+  .btn:active{ transform: translateY(0); }
+  .btn.solid{
+    background: var(--rose);
+    color: var(--cream);
+    border-color: var(--rose);
+  }
+  .btn.solid:hover{
+    background: var(--rose-soft);
+    color: var(--plum);
+  }
+  .btn-row{
+    display: flex;
+    gap: 1.2rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 1.5rem;
+  }
+
+  /* ============ SCREEN 1 — SURPRISE ============ */
+  #screen-open .eyebrow{
+    font-size: 0.95rem;
+    color: var(--rose-soft);
+    letter-spacing: 0.08em;
+    margin-bottom: 0.8rem;
+  }
+  #screen-open h1{
+    font-size: clamp(2.4rem, 6vw, 4.2rem);
+    color: var(--gold-soft);
+    line-height: 1.15;
+  }
+  #screen-open p.sub{
+    max-width: 34ch;
+    margin: 1.2rem auto 0;
+    color: var(--blush);
+    font-size: 1.05rem;
+  }
+  .envelope{
+    font-size: 3rem;
+    margin-top: 2.2rem;
+    animation: pulse 2.4s ease-in-out infinite;
+  }
+  @keyframes pulse{
+    0%,100%{ transform: scale(1); }
+    50%{ transform: scale(1.08); }
+  }
+
+  /* ============ SCREEN 2 — WISH ============ */
+  #screen-wish h1{
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    color: var(--gold-soft);
+    max-width: 20ch;
+  }
+  .typewriter{
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: clamp(1.2rem, 3vw, 1.7rem);
+    color: var(--rose-soft);
+    min-height: 2.6em;
+    margin-top: 1.4rem;
+    border-right: 2px solid var(--gold-soft);
+    display: inline-block;
+    white-space: pre-wrap;
+    max-width: 32ch;
+  }
+  .names{
+    display: flex;
+    gap: 1.6rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 2.4rem;
+  }
+  .names span{
+    font-family: var(--font-display);
+    font-size: 1.3rem;
+    color: var(--cream);
+    background: rgba(216,169,96,0.12);
+    border: 1px solid rgba(216,169,96,0.4);
+    padding: 0.5em 1.3em;
+    border-radius: 999px;
+    opacity: 0;
+    transform: translateY(14px);
+    animation: nameIn 0.7s ease forwards;
+  }
+  .names span:nth-child(1){ animation-delay: 0.2s; }
+  .names span:nth-child(2){ animation-delay: 0.55s; }
+  .names span:nth-child(3){ animation-delay: 0.9s; }
+  @keyframes nameIn{
+    to{ opacity: 1; transform: translateY(0); }
+  }
+
+  /* ============ SCREEN 3 — LOVE STORY ============ */
+  #screen-story h2{
+    font-size: clamp(1.9rem, 5vw, 2.8rem);
+    color: var(--gold-soft);
+    margin-bottom: 0.4rem;
+  }
+  #screen-story .lede{
+    color: var(--blush);
+    max-width: 40ch;
+    margin-bottom: 2.4rem;
+  }
+  .story-track{
+    display: flex;
+    gap: 1.6rem;
+    overflow-x: auto;
+    max-width: 100%;
+    padding: 1rem 4vw 1.6rem;
+    scroll-snap-type: x mandatory;
+  }
+  .story-card{
+    flex: 0 0 auto;
+    width: min(78vw, 300px);
+    scroll-snap-align: center;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(216,169,96,0.25);
+    border-radius: 18px;
+    overflow: hidden;
+    text-align: left;
+  }
+  .story-card .frame{
+    width: 100%;
+    aspect-ratio: 4/5;
+    background: linear-gradient(160deg, var(--wine), var(--plum));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--rose-soft);
+    font-size: 0.85rem;
+    overflow: hidden;
+  }
+  .story-card .frame img{
+    width: 100%; height: 100%; object-fit: cover; display:block;
+  }
+  .story-card .cap{
+    padding: 1rem 1.1rem 1.3rem;
+  }
+  .story-card .cap .tag{
+    font-size: 0.75rem;
+    color: var(--rose-soft);
+    margin-bottom: 0.3rem;
+  }
+  .story-card .cap p{
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: 1.15rem;
+    color: var(--cream);
+    line-height: 1.4;
+  }
+  .hint{
+    font-size: 0.8rem;
+    color: var(--rose-soft);
+    opacity: 0.7;
+    margin-top: 0.4rem;
+  }
+
+  /* ============ SCREEN 4 — FLIRTY ============ */
+  #screen-flirty h2{
+    font-size: clamp(1.8rem, 5vw, 2.6rem);
+    color: var(--gold-soft);
+    max-width: 18ch;
+  }
+  #flirty-answers{
+    margin-top: 1.8rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+    max-width: 38ch;
+  }
+  .flirty-line{
+    background: rgba(201,80,106,0.14);
+    border: 1px solid rgba(201,80,106,0.4);
+    border-radius: 14px;
+    padding: 0.9em 1.2em;
+    font-size: 1.02rem;
+    color: var(--blush);
+    opacity: 0;
+    transform: translateY(10px);
+    animation: nameIn 0.6s ease forwards;
+  }
+
+  /* ============ SCREEN 5 — QUIZ ============ */
+  #screen-quiz .quiz-wrap{
+    max-width: 460px;
+    width: 100%;
+  }
+  #screen-quiz h2{
+    font-size: clamp(1.7rem, 4.5vw, 2.3rem);
+    color: var(--gold-soft);
+  }
+  .progress{
+    height: 4px;
+    width: 100%;
+    background: rgba(255,255,255,0.12);
+    border-radius: 4px;
+    margin: 1.2rem 0 1.8rem;
+    overflow: hidden;
+  }
+  .progress-bar{
+    height: 100%;
+    width: 0%;
+    background: var(--gold);
+    transition: width 0.4s ease;
+  }
+  .q-text{
+    font-family: var(--font-display);
+    font-size: 1.35rem;
+    color: var(--cream);
+    margin-bottom: 1.4rem;
+    min-height: 2.4em;
+  }
+  .q-options{
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+  }
+  .q-option{
+    text-align: left;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(216,169,96,0.3);
+    color: var(--blush);
+    padding: 0.85em 1.1em;
+    border-radius: 12px;
+    font-family: var(--font-body);
+    font-size: 0.98rem;
+    cursor: pointer;
+    transition: background 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
+  }
+  .q-option:hover{
+    background: rgba(216,169,96,0.15);
+    border-color: var(--gold);
+    transform: translateX(3px);
+  }
+  .q-option.chosen{
+    background: var(--rose);
+    border-color: var(--rose);
+    color: var(--cream);
+  }
+  #quiz-result{
+    font-family: var(--font-display);
+    font-size: 1.4rem;
+    color: var(--gold-soft);
+    margin-top: 1rem;
+  }
+
+  /* ============ SCREEN 6 — CHOOSE ONE ============ */
+  #screen-choose h2{
+    font-size: clamp(1.8rem, 5vw, 2.6rem);
+    color: var(--gold-soft);
+    margin-bottom: 1.8rem;
+  }
+  .choose-wrap{ max-width: 480px; width: 100%; }
+  .pair{
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.1rem;
+  }
+  .pair-btn{
+    flex: 1;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(216,169,96,0.3);
+    color: var(--cream);
+    padding: 1.1em 0.6em;
+    border-radius: 14px;
+    font-family: var(--font-body);
+    font-weight: 600;
+    font-size: 0.98rem;
+    cursor: pointer;
+    transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+  }
+  .pair-btn:hover{
+    transform: translateY(-3px);
+    border-color: var(--gold);
+    background: rgba(216,169,96,0.15);
+  }
+  .pair-btn.picked{
+    background: var(--rose);
+    border-color: var(--rose);
+  }
+  #choose-response{
+    margin-top: 1.6rem;
+    min-height: 2.4em;
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 1.15rem;
+    color: var(--rose-soft);
+  }
+
+  /* ============ SCREEN 7 — FINAL LETTER ============ */
+  #screen-final{
+    background: #140811;
+  }
+  .hearts-burst{
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+  .heart-rise{
+    position: absolute;
+    bottom: -10%;
+    font-size: 22px;
+    color: var(--rose);
+    opacity: 0;
+    animation: riseIn 3.5s ease-in forwards;
+  }
+  @keyframes riseIn{
+    0%{ opacity: 0; transform: translateY(0) scale(0.6); }
+    15%{ opacity: 0.9; }
+    100%{ opacity: 0; transform: translateY(-100vh) scale(1.1); }
+  }
+  #screen-final .letter{
+    max-width: 46ch;
+    opacity: 0;
+    animation: letterIn 1.6s ease forwards;
+    animation-delay: 1.2s;
+  }
+  @keyframes letterIn{
+    to{ opacity: 1; }
+  }
+  #screen-final h2{
+    font-size: clamp(1.9rem, 5vw, 2.6rem);
+    color: var(--gold-soft);
+    margin-bottom: 1.2rem;
+  }
+  #screen-final p{
+    font-family: var(--font-display);
+    font-size: 1.2rem;
+    line-height: 1.85;
+    color: var(--blush);
+    margin: 0 0 1rem;
+  }
+  .signoff{
+    margin-top: 1.6rem;
+    color: var(--rose-soft) !important;
+    font-style: italic;
+  }
+
+  
+
+  ::-webkit-scrollbar{ height: 6px; }
+  ::-webkit-scrollbar-thumb{ background: var(--rose); border-radius: 4px; }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; }
+  }
+
+  @media (max-width: 480px){
+    .pair{ flex-direction: row; }
+  }
+</style>
+</head>
+<body>
+
+
+
+<!-- ============ SCREEN 1 : THE SURPRISE ============ -->
+<section class="screen active" id="screen-open">
+  <div class="eyebrow">for My Uyir</div>
+  <h1>Hey, Chellamey… ❤️</h1>
+  <p class="sub">I made you something small. Well… not that small. Give me two minutes of your time?</p>
+  <div class="envelope">💌</div>
+  <div class="btn-row">
+    <button class="btn solid" onclick="goTo('screen-wish')">Open Your Surprise 💌</button>
+  </div>
+</section>
+
+<!-- ============ SCREEN 2 : BIRTHDAY WISH ============ -->
+<section class="screen" id="screen-wish">
+  <h1>Happy Birthday to my<br>most one and only loved one</h1>
+  <div class="typewriter" id="typewriter"></div>
+  <div class="names">
+    <span>Thangakutty 🥰</span>
+    <span>Chellakutty ❤️</span>
+  </div>
+  <div class="btn-row">
+    <button class="btn" onclick="goTo('screen-story')">Continue →</button>
+  </div>
+</section>
+
+<!-- ============ SCREEN 3 : OUR LOVE STORY ============ -->
+<section class="screen" id="screen-story">
+  <h2>Our Little Journey</h2>
+  <p class="lede">A few moments I never want to forget — swipe through with me.</p>
+  <div class="story-track">
+    <div class="story-card">
+      <div class="frame"><img src="images/photo1.jpeg" alt="Us" onerror="this.parentElement.innerHTML='📷 add photo1.jpeg'"></div>
+      <div class="cap"><div class="tag">Where it began</div><p>The day you came into my life…</p></div>
+    </div>
+    <div class="story-card">
+      <div class="frame"><img src="images/photo2.jpeg" alt="Us" onerror="this.parentElement.innerHTML='📷 add photo2.jpeg'"></div>
+      <div class="cap"><div class="tag">Still my favourite</div><p>My favourite memory with you…</p></div>
+    </div>
+    <div class="story-card">
+      <div class="frame"><img src="images/photo3.jpeg" alt="Us" onerror="this.parentElement.innerHTML='📷 add photo3.jpeg'"></div>
+      <div class="cap"><div class="tag">Every single time</div><p>The smile I never get tired of…</p></div>
+    </div>
+  
+  <div class="hint">← swipe →</div>
+  <div class="btn-row">
+    <button class="btn" onclick="goTo('screen-flirty')">Continue →</button>
+  </div>
+</section>
+
+<!-- ============ SCREEN 4 : FLIRTY ============ -->
+<section class="screen" id="screen-flirty">
+  <h2>Do you know why I love you? 😏</h2>
+  <div id="flirty-answers"></div>
+  <div class="btn-row" id="flirty-next-row" style="display:none;">
+    <button class="btn" onclick="goTo('screen-quiz')">Continue →</button>
+  </div>
+</section>
+
+<!-- ============ SCREEN 5 : LOVE QUIZ ============ -->
+<section class="screen" id="screen-quiz">
+  <div class="quiz-wrap">
+    <h2>How Well Do You Know Your Boyfriend? 🎮</h2>
+    <div class="progress"><div class="progress-bar" id="quiz-progress"></div></div>
+    <div class="q-text" id="quiz-question"></div>
+    <div class="q-options" id="quiz-options"></div>
+    <div id="quiz-result"></div>
+    <div class="btn-row" id="quiz-next-row" style="display:none;">
+      <button class="btn" onclick="goTo('screen-choose')">Continue →</button>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SCREEN 6 : CHOOSE ONE ============ -->
+<section class="screen" id="screen-choose">
+  <h2>Choose your dream with me💕</h2>
+  <div class="choose-wrap" id="choose-wrap"></div>
+  <div id="choose-response"></div>
+  <div class="btn-row" id="choose-next-row" style="display:none;">
+    <button class="btn" onclick="goTo('screen-final')">One Last Thing →</button>
+  </div>
+</section>
+
+<!-- ============ SCREEN 7 : FINAL LETTER ============ -->
+<section class="screen" id="screen-final">
+  <div class="hearts-burst" id="hearts-burst"></div>
+  <div class="letter">
+    <h2>My Chellakutty, my Thangakutty…</h2>
+    <p>Once again, happy birthday, love.</p>
+    <p>You're not just someone I fell for — you're the person I want next to me through every ordinary day and every big one that's still coming.</p>
+    <p>I want to be the one who stays. The one who annoys you on purpose, makes you laugh when you don't want to, and still reaches for your hand at the end of it.</p>
+    <p>Whatever the day brings, I'll keep choosing you — today, and every day after this one.</p>
+    <p class="signoff">Happy birthday, my one and only. I love you. ❤️</p>
+  </div>
+</section>
+
+<script>
+/* ============================================================
+   NAVIGATION
+   ============================================================ */
+function goTo(id){
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo({top:0, behavior:'instant'});
+
+  if(id === 'screen-wish') startTypewriter();
+  if(id === 'screen-flirty') startFlirty();
+  if(id === 'screen-quiz') startQuiz();
+  if(id === 'screen-choose') startChoose();
+  if(id === 'screen-final') startFinale();
+}
+
+/* ============================================================
+   AMBIENT FLOATING HEARTS (background, all screens)
+   ============================================================ */
+(function ambient(){
+  const el = document.getElementById('ambient');
+  const symbols = ['❤️','💕','✨','🌸'];
+  setInterval(() => {
+    const d = document.createElement('div');
+    d.className = 'drift';
+    d.textContent = symbols[Math.floor(Math.random()*symbols.length)];
+    d.style.left = Math.random()*100 + 'vw';
+    d.style.setProperty('--drift-x', (Math.random()*80-40)+'px');
+    d.style.fontSize = (14 + Math.random()*16) + 'px';
+    d.style.animationDuration = (7 + Math.random()*6) + 's';
+    el.appendChild(d);
+    setTimeout(() => d.remove(), 14000);
+  }, 900);
+})();
+
+
+/* ============================================================
+   SCREEN 2 — TYPEWRITER
+   ============================================================ */
+let typewriterDone = false;
+function startTypewriter(){
+  if(typewriterDone) return;
+  typewriterDone = true;
+  const el = document.getElementById('typewriter');
+  const text = "The girl who turned my ordinary life into something I look forward to, every single day.";
+  let i = 0;
+  function tick(){
+    if(i <= text.length){
+      el.textContent = text.slice(0, i);
+      i++;
+      setTimeout(tick, 38);
+    } else {
+      el.style.borderRight = 'none';
+    }
+  }
+  tick();
+}
+
+/* ============================================================
+   SCREEN 4 — FLIRTY REVEAL
+   ============================================================ */
+let flirtyDone = false;
+function startFlirty(){
+  if(flirtyDone) return;
+  flirtyDone = true;
+  const lines = [
+    "Because my heart apparently has excellent taste. 😌❤️",
+    "Because you laugh at my worst jokes like they're comedy gold.",
+    "Because you make ordinary Tuesdays feel like something worth showing up for.",
+    "Because somehow, you still put up with me. 😏",
+    "...okay fine, mostly because it's just you. It was always going to be you."
+  ];
+  const wrap = document.getElementById('flirty-answers');
+  lines.forEach((line, idx) => {
+    setTimeout(() => {
+      const p = document.createElement('div');
+      p.className = 'flirty-line';
+      p.textContent = line;
+      wrap.appendChild(p);
+      if(idx === lines.length - 1){
+        document.getElementById('flirty-next-row').style.display = 'flex';
+      }
+    }, idx * 900);
+  });
+}
+
+/* ============================================================
+   SCREEN 5 — QUIZ GAME
+   ============================================================ */
+const quizData = [
+  { q: "Where did we first meet?", options: ["College", "School", "Online", "It's a secret 😏"] },
+  { q: "What's my favourite way to spend time with you?", options: ["Long calls at night", "Random drives", "Just sitting quietly together", "All of the above, obviously"] },
+  { q: "What do I tease you about the most?", options: ["Your food choices", "How you talk in your sleep", "Your dramatic reactions", "Everything, honestly"] },
+  { q: "What's my favourite nickname for you?", options: ["Chellamey", "Thangakutty", "Chellakutty", "Depends on my mood"] },
+  { q: "What do I actually love most about you?", options: ["Your smile", "Your kindness", "The way you understand me", "Every single thing"] }
+];
+let quizIndex = 0;
+let quizStarted = false;
+
+function startQuiz(){
+  if(quizStarted) return;
+  quizStarted = true;
+  renderQuiz();
+}
+
+function renderQuiz(){
+  const total = quizData.length;
+  document.getElementById('quiz-progress').style.width = ((quizIndex)/total*100) + '%';
+
+  if(quizIndex >= total){
+    document.getElementById('quiz-question').textContent = '';
+    document.getElementById('quiz-options').innerHTML = '';
+    document.getElementById('quiz-progress').style.width = '100%';
+    document.getElementById('quiz-result').textContent = "Congratulations! You officially know the idiot who loves you the most. 😂❤️";
+    document.getElementById('quiz-next-row').style.display = 'flex';
+    return;
+  }
+
+  const item = quizData[quizIndex];
+  document.getElementById('quiz-question').textContent = item.q;
+  const optWrap = document.getElementById('quiz-options');
+  optWrap.innerHTML = '';
+  item.options.forEach(opt => {
+    const b = document.createElement('button');
+    b.className = 'q-option';
+    b.textContent = opt;
+    b.onclick = () => {
+      b.classList.add('chosen');
+      document.querySelectorAll('#quiz-options .q-option').forEach(o => o.disabled = true);
+      setTimeout(() => {
+        quizIndex++;
+        renderQuiz();
+      }, 450);
+    };
+    optWrap.appendChild(b);
+  });
+}
+
+/* ============================================================
+   SCREEN 6 — CHOOSE ONE GAME
+   ============================================================ */
+const choosePairs = [
+  { a: "Hug 🤗", b: "Kiss 😘",
+    ra: "Mmm, a hug it is — I'll just hold on a little longer than usual.",
+    rb: "A kiss, huh? Noted. Collecting on that soon." },
+  { a: "Movie night 🎬", b: "Long drive 🚗",
+    ra: "Movie night — as long as you're the one choosing the snacks.",
+    rb: "Long drive — windows down, your playlist, no destination. Perfect." },
+  { a: "My annoying messages 😏", b: "My romantic messages ❤️",
+    ra: "The annoying ones? Bold choice. I'll send double.",
+    rb: "Romantic it is — though fair warning, the annoying ones sneak in anyway." }
+];
+let chooseStarted = false;
+
+function startChoose(){
+  if(chooseStarted) return;
+  chooseStarted = true;
+  const wrap = document.getElementById('choose-wrap');
+  choosePairs.forEach((pair, idx) => {
+    const row = document.createElement('div');
+    row.className = 'pair';
+    row.innerHTML = `
+      <button class="pair-btn" data-side="a">${pair.a}</button>
+      <button class="pair-btn" data-side="b">${pair.b}</button>
+    `;
+    wrap.appendChild(row);
+
+    row.querySelectorAll('.pair-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        row.querySelectorAll('.pair-btn').forEach(b => b.classList.remove('picked'));
+        btn.classList.add('picked');
+        row.querySelectorAll('.pair-btn').forEach(b => b.disabled = true);
+        const side = btn.getAttribute('data-side');
+        document.getElementById('choose-response').textContent = side === 'a' ? pair.ra : pair.rb;
+        checkChooseComplete();
+      });
+    });
+  });
+}
+
+function checkChooseComplete(){
+  const allPicked = document.querySelectorAll('.pair-btn.picked').length === choosePairs.length;
+  if(allPicked){
+    document.getElementById('choose-next-row').style.display = 'flex';
+  }
+}
+
+/* ============================================================
+   SCREEN 7 — FINAL HEART BURST
+   ============================================================ */
+let finaleStarted = false;
+function startFinale(){
+  if(finaleStarted) return;
+  finaleStarted = true;
+  const burst = document.getElementById('hearts-burst');
+  for(let i = 0; i < 26; i++){
+    setTimeout(() => {
+      const h = document.createElement('div');
+      h.className = 'heart-rise';
+      h.textContent = ['❤️','💕','🌹','✨'][Math.floor(Math.random()*4)];
+      h.style.left = Math.random()*100 + '%';
+      h.style.fontSize = (16 + Math.random()*20) + 'px';
+      h.style.animationDuration = (3 + Math.random()*2.5) + 's';
+      burst.appendChild(h);
+      setTimeout(() => h.remove(), 6000);
+    }, i * 140);
+  }
+}
+</script>
+
+</body>
+</html>
